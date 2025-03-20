@@ -11,6 +11,7 @@ import unix from "../components/unix.ts";
 
 export default function Page() {
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
     const {user} = useUser();
     const userrole: User = { id: user?.id ?? "", roles: (user?.publicMetadata.roles as Role[]) ?? [] }
     const [homework, sethomework] = useState<homeworkdataint[]>([
@@ -35,21 +36,17 @@ export default function Page() {
 
     useEffect(() => {
         async function getdata() {
-            const fetchhw = await axios.get("/api/homework")
-            const hw = await fetchhw.data;
-            if (!hw.error) {
-                sethomework(hw)
+            const fetchhw = await axios.get("/api/dashboard")
+            const {homework, exams} = await fetchhw.data;
+            if (homework && exams) {
+                sethomework(homework)
+                setexam(exams)
+            } else {
+                setError(true)
             }
-
-            const fetchexam = await axios.get("/api/exams")
-            const em = await fetchexam.data;
-            if (!em.error) {
-                setexam(em)
-            }
-
             setLoading(false)
         }
-
+        if(hasPerms(userrole, "homework", "view") && hasPerms(userrole, "exams", "view"))
         getdata()
     }, []);
 
@@ -111,12 +108,21 @@ export default function Page() {
                 </div>
             </>
         )
-    } else {
+    } else if (error) {
         return (
             <>
                 <div className="min-w-full w-full ml-5">
                     <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
                     <h1 className="text-3xl">An error accorded</h1>
+                </div>
+            </>
+        )
+    } else {
+        return (
+            <>
+                <div className="min-w-full w-full ml-5">
+                    <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
+                    <h1 className="text-3xl"></h1>
                 </div>
             </>
         )
