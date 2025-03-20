@@ -46,8 +46,9 @@ export default function Page() {
             }
             setLoading(false)
         }
-        if(hasPerms(userrole, "homework", "view") && hasPerms(userrole, "exams", "view"))
-        getdata()
+        if(hasPerms(userrole, "homework", "view") && hasPerms(userrole, "exams", "view")) {
+            getdata()
+        }
     }, []);
 
     if (!loading && hasPerms(userrole, "exams", "view") && hasPerms(userrole, "homework", "view")) {
