@@ -2,10 +2,8 @@
 <h1 align="center" style="font-weight: bold;">School Dash</h1>
 
 <p align="center">
-<a href="#tech">Technologies</a>
-<a href="#started">Getting Started</a>
-<a href="#routes">API Endpoints</a>
-<a href="#colab">Collaborators</a>
+<a href="#tech">Technologies</a> |
+<a href="#started">Getting Started</a> |
 <a href="#contribute">Contribute</a> 
 </p>
 
@@ -39,7 +37,7 @@ git clone github.com/CatPaulKatze/School-Dash.git
 
 <h3>Config .env variables</h2>
 
-Use the `.env.example` as reference to create your configuration file `.env` with your AWS Credentials
+Use the `.env.example` as reference to create your configuration file `.env` with your Credentials
 
 ```yaml
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY={your Clerk public key}
