@@ -179,7 +179,7 @@ export default function Homework() {
                     </table>
                 </IconContext.Provider>
 
-                {/* Modals */}
+
                 {deleteModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <div className="bg-base-300 p-6 rounded-lg">
