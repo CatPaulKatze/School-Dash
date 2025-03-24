@@ -4,7 +4,7 @@ import axios from "axios";
 import {homeworkdataint} from "../../interfaces/homeworkdata.ts";
 import {useEffect, useState} from "react";
 import unix from "../../components/unix"
-import {useUser} from "@clerk/nextjs";
+import {SignedIn, SignedOut, useUser} from "@clerk/nextjs";
 import {hasPerms} from "../../components/auth.ts";
 import {Role, User} from "../../interfaces/authint.ts";
 import {FaRegEdit} from "react-icons/fa";
@@ -22,10 +22,9 @@ export default function Page() {
         }
     ]
 
-    const [hw, sethw] = useState(defaulthomework);
-    const [access, setaccess] = useState(false);
+    const [homework, sethomework] = useState(defaulthomework);
     const [loading, setLoading] = useState(true);
-    const sortedHomework = [...hw].sort((a, b) => a.deadline - b.deadline);
+    const sortedHomework = [...homework].sort((a, b) => a.deadline - b.deadline);
     const {user} = useUser();
     const userrole: User = { id: user?.id ?? "", roles: (user?.publicMetadata.roles as Role[]) ?? [] }
     const [deleteModal, setDeleteModal] = useState(false);
@@ -50,15 +49,12 @@ export default function Page() {
                 const fetch = await axios.get("/api/homework")
                 const data = await fetch.data;
                 if (!data.error) {
-                    setaccess(true);
-                    sethw(data)
+                    sethomework(data)
                 } else {
-                    setaccess(false);
                 }
                 setLoading(false)
             } catch {
                 setLoading(false)
-                setaccess(false);
             }
         }
 
@@ -67,14 +63,14 @@ export default function Page() {
 
     const handleEdit = (index: number) => {
         const sortedItem = sortedHomework[index];
-        const originalIndex = hw.findIndex(item => item._id === sortedItem._id);
-        const homework = hw[originalIndex];
+        const originalIndex = homework.findIndex(item => item._id === sortedItem._id);
+        const hw = homework[originalIndex];
 
-        const deadlineDate = new Date(homework.deadline * 1000);
+        const deadlineDate = new Date(hw.deadline * 1000);
         deadlineDate.setHours(12, 0, 0, 0);
 
         setEditFormData({
-            ...homework,
+            ...hw,
             deadline: Math.floor(deadlineDate.getTime() / 1000)
         });
         setEditModal(true);
@@ -91,7 +87,7 @@ export default function Page() {
     const confirmEdit = async () => {
         try {
             await axios.patch(`/api/homework/${editFormData._id}`, editFormData);
-            sethw(prevHw => prevHw.map(item =>
+            sethomework(prevHw => prevHw.map(item =>
                 item._id === editFormData._id ? editFormData : item
             ));
             setEditModal(false);
@@ -102,7 +98,7 @@ export default function Page() {
 
     const handleDelete = (index: number) => {
         const sortedItem = sortedHomework[index];
-        const originalIndex = hw.findIndex(item => item._id === sortedItem._id);
+        const originalIndex = homework.findIndex(item => item._id === sortedItem._id);
         setDeleteIndex(originalIndex);
         setDeleteModal(true);
     };
@@ -111,9 +107,9 @@ export default function Page() {
         if (deleteIndex === null) return;
 
         try {
-            const homework = hw[deleteIndex];
-            await axios.delete(`/api/homework/${homework._id}`);
-            sethw(prevHw => prevHw.filter((_, i) => i !== deleteIndex));
+            const hw = homework[deleteIndex];
+            await axios.delete(`/api/homework/${hw._id}`);
+            sethomework(prevHw => prevHw.filter((_, i) => i !== deleteIndex));
         } catch (error) {
             console.error('Failed to delete homework:', error);
         }
@@ -125,7 +121,7 @@ export default function Page() {
     const handleCreate = async () => {
         try {
             const response = await axios.post('/api/homework', newHomework);
-            sethw(prevHw => [...prevHw, response.data]);
+            sethomework(prevHw => [...prevHw, response.data]);
             setCreateModal(false);
             setNewHomework({
                 subject: '',
@@ -138,7 +134,7 @@ export default function Page() {
     };
 
 
-    if(!loading && access) {
+    if(!loading && hasPerms(userrole, "homework", "view")) {
         return (
             <div className="ml-5 mr-5">
                 <div className="flex justify-between items-center mb-10">
@@ -319,12 +315,28 @@ export default function Page() {
                 <h1 className="text-3xl">Loading...</h1>
             </div>
         )
+    } else if (!hasPerms(userrole, "homework", "view")) {
+        return (
+            <>
+                <div className="min-w-full w-full ml-5">
+                    <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
+                    <h1 className="text-3xl">Access restricted</h1>
+                </div>
+            </>
+        )
     } else {
         return (
-            <div className="min-w-full w-full ml-5">
-                <h1 className="text-5xl text-amber-400 mb-10">Homework</h1>
-                <h1 className="text-3xl">Access restricted</h1>
-            </div>
+            <>
+                <div className="min-w-full w-full ml-5">
+                    <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
+                    <SignedIn>
+                        <h1 className="text-3xl">An error accorded</h1>
+                    </SignedIn>
+                    <SignedOut>
+                        <h1 className="text-3xl">Access restricted</h1>
+                    </SignedOut>
+                </div>
+            </>
         )
     }
 }
