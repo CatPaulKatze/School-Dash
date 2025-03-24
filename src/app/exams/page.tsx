@@ -7,7 +7,7 @@ import unix from "../../components/unix.ts"
 import { IconContext } from "react-icons";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { useUser } from "@clerk/nextjs";
+import {SignedIn, SignedOut, useUser} from "@clerk/nextjs";
 import { hasPerms } from "../../components/auth";
 import { Role, User } from "../../interfaces/authint";
 
@@ -24,7 +24,6 @@ export default function Homework() {
     ]
 
     const [exam, setexam] = useState(defaultexam);
-    const [access, setaccess] = useState(false);
     const [loading, setLoading] = useState(true);
     const sortedExams = [...exam].sort((a, b) => a.day - b.day);
     const {user} = useUser();
@@ -49,13 +48,12 @@ export default function Homework() {
 
     useEffect(() => {
         async function getdata() {
-            const fetch = await axios.get("/api/exams")
-            const data = await fetch.data;
-            if (!data.error) {
-                setaccess(true);
-                setexam(data)
-            } else {
-                setaccess(false);
+            try {
+                const fetch = await axios.get("/api/exams")
+                const data = await fetch.data;
+                setexam(data);
+            } catch (err) {
+                console.error(err);
             }
             setLoading(false)
         }
@@ -129,7 +127,7 @@ export default function Homework() {
     };
 
 
-            if (access) {
+    if (!loading && hasPerms(userrole, "exams", "view")) {
         return (
             <div className="ml-5 mr-5">
                 <div className="flex justify-between items-center mb-10">
@@ -313,11 +311,23 @@ export default function Homework() {
                 <h1 className="text-3xl">Loading...</h1>
             </div>
         )
-    } else {
+    } else if (!hasPerms(userrole, "exams", "view") && hasPerms(userrole, "homework", "view")) {
         return (
             <div className="min-w-full w-full ml-5">
                 <h1 className="text-5xl text-amber-400 mb-10">Exams</h1>
                 <h1 className="text-3xl">Access restricted</h1>
+            </div>
+        )
+    } else {
+        return (
+            <div className="min-w-full w-full ml-5">
+                <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
+                <SignedIn>
+                    <h1 className="text-3xl">An error accorded</h1>
+                </SignedIn>
+                <SignedOut>
+                    <h1 className="text-3xl">Access restricted</h1>
+                </SignedOut>
             </div>
         )
     }

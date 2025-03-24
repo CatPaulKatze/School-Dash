@@ -48,14 +48,11 @@ export default function Page() {
             try {
                 const fetch = await axios.get("/api/homework")
                 const data = await fetch.data;
-                if (!data.error) {
-                    sethomework(data)
-                } else {
-                }
-                setLoading(false)
-            } catch {
-                setLoading(false)
+                sethomework(data);
+            } catch (err) {
+                console.error(err);
             }
+            setLoading(false);
         }
 
         getdata()

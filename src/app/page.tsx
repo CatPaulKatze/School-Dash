@@ -4,14 +4,13 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {homeworkdataint} from "../interfaces/homeworkdata.ts";
 import {examdataint} from "../interfaces/examdata.ts";
-import {useUser} from "@clerk/nextjs";
+import {SignedIn, SignedOut, useUser} from "@clerk/nextjs";
 import {Role, User} from "../interfaces/authint.ts";
 import {hasPerms} from "../components/auth.ts";
 import unix from "../components/unix.ts";
 
 export default function Page() {
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
     const {user} = useUser();
     const userrole: User = { id: user?.id ?? "", roles: (user?.publicMetadata.roles as Role[]) ?? [] }
     const [homework, sethomework] = useState<homeworkdataint[]>([
@@ -36,13 +35,13 @@ export default function Page() {
 
     useEffect(() => {
         async function getdata() {
-            const fetchhw = await axios.get("/api/dashboard")
-            const {homework, exams} = await fetchhw.data;
-            if (homework && exams) {
-                sethomework(homework)
-                setexam(exams)
-            } else {
-                setError(true)
+            try {
+                const fetch = await axios.get("/api/dashboard")
+                const {homework, exams} = await fetch.data;
+                sethomework(homework);
+                setexam(exams);
+            } catch (err) {
+                console.error(err);
             }
             setLoading(false)
         }
@@ -107,21 +106,17 @@ export default function Page() {
                 </div>
             </>
         )
-    } else if (error) {
-        return (
-            <>
-                <div className="min-w-full w-full ml-5">
-                    <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
-                    <h1 className="text-3xl">An error accorded</h1>
-                </div>
-            </>
-        )
     } else {
         return (
             <>
                 <div className="min-w-full w-full ml-5">
                     <h1 className="text-5xl text-amber-400 mb-10">Dashboard</h1>
-                    <h1 className="text-3xl"></h1>
+                    <SignedIn>
+                        <h1 className="text-3xl">An error accorded</h1>
+                    </SignedIn>
+                    <SignedOut>
+                        <h1 className="text-3xl">Access restricted</h1>
+                    </SignedOut>
                 </div>
             </>
         )
