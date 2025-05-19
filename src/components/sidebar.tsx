@@ -18,6 +18,7 @@ import {useTheme} from "next-themes";
 import {GraduationCap, Laptop, Moon, Sun} from "lucide-react";
 import {NavUser} from "@/components/NavUser";
 import Link from "next/link";
+import {Button} from "@/components/ui/button";
 
 const data = {
     navMain: [
@@ -90,6 +91,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 ))}
             </SidebarContent>
             <SidebarFooter>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 justify-end ml-auto mr-2"
+                    onClick={() => {
+                        setTheme(theme === "light" ? "dark" : "light")
+                    }}
+                >
+                    {mounted && ThemeIcon && <ThemeIcon className="h-4 w-4" />}
+                    <span className="sr-only">Toggle theme</span>
+                </Button>
                 <NavUser/>
             </SidebarFooter>
             <SidebarRail />
