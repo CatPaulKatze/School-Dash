@@ -1,0 +1,98 @@
+"use client"
+
+import * as React from "react"
+
+import {
+    Sidebar,
+    SidebarContent, SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarRail,
+} from "@/components/ui/sidebar"
+import {useTheme} from "next-themes";
+import {GraduationCap, Laptop, Moon, Sun} from "lucide-react";
+import {NavUser} from "@/components/NavUser";
+import Link from "next/link";
+
+const data = {
+    navMain: [
+        {
+            title: "Titel",
+            url: "/",
+            items: [
+                {
+                    title: "Dashboard",
+                    url: "/",
+                    isActive: true,
+                },
+                {
+                    title: "Homework",
+                    url: "/homework",
+                },
+                {
+                    title: "Exams",
+                    url: "/exams",
+                },
+                {
+                    title: "Changes",
+                    url: "/changes",
+                },
+            ],
+        },
+
+    ],
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { theme, setTheme } = useTheme()
+    const [mounted, setMounted] = React.useState(false)
+
+    React.useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const ThemeIcon = React.useMemo(() => {
+        if (!mounted) return null
+
+        if (theme === "dark") return Moon
+        if (theme === "light") return Sun
+        return Laptop
+    }, [theme, mounted])
+
+    return (
+        <Sidebar {...props}>
+            <SidebarHeader>
+                <Link href="/">
+                    <h1 className="flex justify-center font-semibold text-3xl"><GraduationCap size={40} className="mr-1"/> School Dash</h1>
+                </Link>
+            </SidebarHeader>
+            <SidebarContent>
+                {data.navMain.map((item) => (
+                    <SidebarGroup key={item.title}>
+                        <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {item.items.map((item) => (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild isActive={item.isActive}>
+                                            <Link href={item.url}>{item.title}</Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                ))}
+            </SidebarContent>
+            <SidebarFooter>
+                <NavUser/>
+            </SidebarFooter>
+            <SidebarRail />
+        </Sidebar>
+    )
+}
