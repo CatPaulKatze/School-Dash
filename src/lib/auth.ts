@@ -10,8 +10,14 @@ let authSource: string
 if (process.env.MONGODB_AUTH_SOURCE_ADMIN === "true") {
     authSource = "?authSource=admin"
 }
+let mongodbUri: string
+if (!process.env.MONGODB_URI) {
+    mongodbUri = "mongodb://localhost:27017"
+} else {
+    mongodbUri = process.env.MONGODB_URI
+}
 
-const client = new MongoClient(process.env.MONGODB_URI + "/auth" + authSource);
+const client = new MongoClient(mongodbUri + "/auth" + authSource);
 const db = client.db()
 
 export const auth = betterAuth({
