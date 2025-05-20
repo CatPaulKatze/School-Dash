@@ -20,7 +20,7 @@ import {NavUser} from "@/components/NavUser";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 
-const data = {
+const routes = {
     navMain: [
         {
             title: "Titel",
@@ -73,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
             </SidebarHeader>
             <SidebarContent>
-                {data.navMain.map((item) => (
+                {routes.navMain.map((item) => (
                     <SidebarGroup key={item.title}>
                         <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
                         <SidebarGroupContent>
