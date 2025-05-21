@@ -52,6 +52,7 @@ const routes = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = React.useState(false)
+    const pathname = usePathname()
 
     React.useEffect(() => {
         setMounted(true)
@@ -80,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <SidebarMenu>
                                 {item.items.map((item) => (
                                     <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild isActive={item.url == usePathname()}>
+                                        <SidebarMenuButton asChild isActive={item.url == pathname}>
                                             <Link href={item.url}>{item.title}</Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
