@@ -23,8 +23,8 @@ export default function RootLayout({children,}: {children: React.ReactNode}) {
                             <div className="flex-1">{children}</div>
                         </SidebarInset>
                     </SidebarProvider>
+                    <Toaster />
                 </ThemeProvider>
-                <Toaster />
             </body>
         </html>
     )

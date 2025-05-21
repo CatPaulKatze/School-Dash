@@ -19,17 +19,17 @@ import {GraduationCap, Laptop, Moon, Sun} from "lucide-react";
 import {NavUser} from "@/components/NavUser";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
+import {usePathname} from "next/navigation";
 
 const routes = {
     navMain: [
         {
-            title: "Titel",
+            title: "",
             url: "/",
             items: [
                 {
                     title: "Dashboard",
                     url: "/",
-                    isActive: true,
                 },
                 {
                     title: "Homework",
@@ -80,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <SidebarMenu>
                                 {item.items.map((item) => (
                                     <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild isActive={item.isActive}>
+                                        <SidebarMenuButton asChild isActive={item.url == usePathname()}>
                                             <Link href={item.url}>{item.title}</Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
